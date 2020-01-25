@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>rustdoc: beyond documentation</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+<h1>rustdoc: beyond documentation</h1>
+
+<p>FOSDEM 2020 - Rust devroom</p>
+
+<p>Guillaume Gomez &lt; <span style="color:#cea116;">guillaume1.gomez@gmail.com</span> &gt;</p>
+				</section>
+				<section data-markdown>
+## Who am I?
+
+Rust language reviewer and contributor.
+
+Member of:
+
+ * rustdoc team (team leader)
+ * documentation team
+ * docs.rs team
+ * tools team
+				</section>
+				<section data-markdown>
+## What is rustdoc?
+				</section>
+				<section data-markdown>
+## Using rustdoc
+
+```bash
+$ cargo doc
+$ cargo doc --open
+```
+				</section>
+				<section data-markdown>
+### Fun fact
+
+You can use **rustdoc** to convert markdown to HTML:
+
+```bash
+$ rustdoc your_markdown_file
+```
+				</section>
+				<section data-markdown>
+## Documenting
+
+```rust
+//! Documenting current module.
+
+/// Documenting the foo function.
+pub fn foo(nb: i32) {}
+```
+				</section>
+				<section data-markdown>
+### Syntactic sugar?
+
+```rust
+#![doc = "Documenting current module."]
+
+#[doc = "Documenting the foo function."]
+pub fn foo(nb: i32) {}
+```
+				</section>
+				<section data-markdown>
+### Discover information on your own types!
+
+ * Blanket implementations
+ * Auto-traits
+				</section>
+				<section data-markdown>
+### Enforce documentation through lints
+
+```rust
+#![deny(missing_docs)]
+#![deny(missing_doc_example)]
+```
+				</section>
+				<section data-markdown>
+## Beyond documentation
+
+What about *testing* the code examples?
+
+````rust
+/// Code example!
+///
+/// ```rust,no_run
+/// let x = 12;
+/// foo(x);
+/// panic!("woups!");
+/// ```
+pub fn foo(nb: i32) {}
+````
+				</section>
+				<section data-markdown>
+### Running doctests
+
+```bash
+$ cargo test
+$ cargo test --doc
+```
+				</section>
+				<section data-markdown>
+### More tags
+
+ * allow_fail
+ * compile_fail
+ * edition\[2015|2018|2021?\]
+ * ignore
+ * no_run
+ * rust
+ * should_panic
+ * everything else: instruction for syntax highlighting
+				</section>
+				<section data-markdown>
+## But's that not all!
+
+ * works with JS disabled
+ * search
+ * no need for internet connection
+ * source code viewer
+ * settings
+ * themes
+ * customizable
+				</section>
+				<section data-markdown>
+## What's coming next?
+
+ * more interactive soure code viewer
+ * automatic link generation based on the type name
+ * more output formats supported
+ * conditional documentation
+ * doc aliases for search
+				</section>
+				<section data-markdown>
+## Thanks for listening!
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
