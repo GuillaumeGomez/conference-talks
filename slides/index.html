@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Gtk-rs: Newest and future developments</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+<h1>Gtk-rs: Newest and future developments</h1>
+
+<p>FOSDEM 2019 - Rust devroom</p>
+
+<p>Guillaume Gomez &lt; <span style="color:#cea116;">guillaume1.gomez@gmail.com</span> &gt;</p>
+				</section>
+				<section data-markdown>
+## Who am I?
+
+Rust reviewer and contributor.
+
+Gtk-rs organization owner.
+				</section>
+				<section data-markdown>
+## What is Gtk-rs?
+				</section>
+				<section data-markdown>
+## Let's start with the newest developments!
+				</section>
+				<section data-markdown>
+## New library generated: Atk
+
+It's an accessibility toolkit library. It felt like a miss not having it. Now it's fixed.
+				</section>
+				<section data-markdown>
+## New crate to test UIs
+
+We called it `gtk-test`. It's very nice and easy to use to help you testing your UIs.
+				</section>
+				<section data-markdown>
+## Example
+
+```rust
+let button = Button::new();
+button.set_label("button");
+button.connect_clicked(|b| {
+    b.set_label("clicked!");
+});
+// ...
+gtk_test::click(&button);
+gtk_test::wait(1000);
+assert_label!(button, "clicked!");
+```
+				</section>
+				<section data-markdown>
+## Added continuous integration for MacOS
+				</section>
+				<section data-markdown>
+## API improvements
+
+* More functions generated
+* Improved `Debug` implementation
+* Added support of `Future` for async functions
+* Huge improvement of glib's channels
+* Lots of bug fixes
+				</section>
+				<section data-markdown>
+## But also...
+
+More `Into` bounds:
+
+```rust
+fn set_comments&lt;'a, P: Into&lt;Option&lt;&'a str&gt;&gt;&gt;(
+    &self,
+    comments: P,
+);
+
+fn append&lt;'a, P: Into&lt;Option&lt;&'a TreeIter&gt;&gt;&gt;(
+    &self,
+    parent: P,
+) -&gt; TreeIter;
+```
+				</section>
+				<section data-markdown>
+## And also...
+
+Add of `Display` implementation:
+
+```rust
+let widget = gtk::Button::new_with_label("hello");
+println!("This is a {}!", widget);
+```
+
+Which gives:
+
+```text
+This is a Button!
+```
+
+You can disable its generation with the `generate_display_trait` flag.
+				</section>
+				<section data-markdown>
+## More and more GNOME applications are being written with Gtk-rs
+
+* Fractal
+* Podcasts
+* Gradio (work in progress)
+* NewsFlash (rewritten from FeedReader, work in progress)
+* ...
+				</section>
+				<section>
+<h2>Who said F.A.Q.?</h2>
+<img src="faq.png" alt="faq">
+				</section>
+				<section data-markdown>
+## What will come next?
+				</section>
+				<section data-markdown>
+## More API improvements!
+
+* Functions with callback generation (not signals!)
+* Less clones of `String` thanks to `GString` type
+* Object inheritance
+				</section>
+				<section data-markdown>
+### Functions with callback?
+
+Coming from this:
+
+```C
+void
+gtk_assistant_set_forward_page_func(
+    GtkAssistant *assistant,
+    GtkAssistantPageFunc page_func,
+    gpointer data,
+    GDestroyNotify destroy)
+```
+
+To this:
+
+```rust
+fn set_forward_page_func(
+    &self,
+    page_func: Option&lt;Box&lt;dyn Fn(i32) -> i32 + 'static&gt;&gt;)
+```
+				</section>
+				<section data-markdown>
+### Functions with callback?
+
+Few things different from C:
+
+* Don't allow user to pass a `destroy` closure
+* Remove "user data" parameters
+* Handle lifetimes nicely
+* Handle concurrency nicely
+				</section>
+				<section data-markdown>
+## The almighty gir
+
+* Corner stone of the Gtk-rs project
+* Lot of contributors (10) and contributions (~310 commits since last FOSDEM!)
+* More and more projects depending on it
+				</section>
+				<section data-markdown>
+## Gtk-rs environment
+
+About continuous integration and tools.
+				</section>
+				<section data-markdown>
+## A few numbers
+
+* 29 crates (and we're not counting gstreamer crates!)
+* 27 repositories
+* 2 new releases since last FOSDEM
+				</section>
+				<section data-markdown>
+## More automation
+
+A bot to handle:
+
+* Merge queues
+* Auto-regeneration
+* Help to new contributors
+* ... And much more! (to be determined)
+				</section>
+				<section data-markdown>
+## Continuous integration
+
+Currently, not wonderful because of Gtk-rs strong inter-dependencies.
+
+Solution: make it more clever when updating any crate.
+				</section>
+				<section data-markdown>
+## What about 1.0 release?
+
+Things to be done:
+
+* Full inheritance support
+* Continue to work on performance
+* Improve internals (gir really needs it!)
+* Maybe better documentation? (but more tutorials for sure!)
+
+(Yes, we're getting close!)
+				</section>
+				<section data-markdown>
+## Next release?
+
+Soon!
+				</section>
+				<section data-markdown>
+## Thanks for listening!
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
