@@ -1,7 +1,7 @@
-# gtk-rs-fosdem-2019-talk
+# Conference talks
 
-Talk I made for the 2019 FOSDEM.
+Talks for various conferences.
 
-To open it, just open `slides/index.html` into your browser (from a local folder so styles and stuff are loaded correctly).
+To open them, just open `slides/index.html` into your browser (from a local folder so styles and stuff are loaded correctly).
 
-Video URL will be put here when available.
+Video URL will be added when available.
