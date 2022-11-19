@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Unsafe in Rust</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/style.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+<h1>Unsafe in Rust</h1>
+
+<p>by Guillaume Gomez</p>
+				</section>
+				<section>
+<h2>Who am I?</h2>
+
+Rust language reviewer and contributor.
+<span style="padding: 0.9em 0;display: block;">Member of:</span>
+<ul>
+	<li>rustdoc team (team leader)</li>
+	<li>docs.rs team</li>
+	<li>tools team</li>
+</ul>
+<br>
+<br>
+I am a <span style="color:#cea116;">Huawei</span> engineer.
+				</section>
+				<section data-markdown>
+### What is unsafe Rust?
+
+Quoting:
+
+> Code or interfaces whose memory safety cannot be verified by the type system.
+				</section>
+				<section data-markdown>
+### What does unsafe allow?
+
+ * Dereference raw pointers
+ * Implement unsafe traits
+ * Call unsafe functions
+ * Mutate statics (including external ones)
+ * Access fields of unions
+				</section>
+				<section data-markdown>
+### What is "FFI"?
+
+"FFI" stands for "Foreign Function Interface".
+
+In short: declaring items from a C library in your Rust code to use them.
+				</section>
+				<section data-markdown>
+<script type="text/template">
+### Example of FFI 
+
+```c
+typedef struct {
+	int field;
+	char *field2;
+} type_t;
+
+type_t *some_fn(int v) {
+	// ...
+}
+```
+
+<div style="position:relative">
+
+<pre><code class="lang-rust" data-noescape><span class="hljs-meta">#[repr(C)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">type_t</span></span> {
+    field: <span class="hljs-built_in">i32</span>,
+    field2: &ast;<span class="hljs-keyword">mut</span> <span class="hljs-built_in">i8</span>,
+}
+
+<span class="hljs-keyword">extern</span> <span class="hljs-string">"C"</span> {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">some_fn</span></span>(v: <span class="hljs-built_in">i32</span>) -&gt; &ast;<span class="hljs-keyword">mut</span> type_t;
+}
+</code></pre>
+<!-- .element: class="special fragment fade-in-then-out" -->
+
+<code class="lang-rust" data-noescape><span class="hljs-meta">#[repr(C)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">type_t</span></span> {
+    field: <span class="hljs-built_in invalid">i32</span>,
+    field2: <span class="invalid">&ast;mut i8</span>,
+}
+
+<span class="hljs-keyword">extern</span> <span class="hljs-string">"C"</span> {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">some_fn</span></span>(v: <span class="invalid">i32</span>) -&gt; &ast;<span class="hljs-keyword">mut</span> type_t;
+}
+</code>
+<!-- .element: class="special fragment fade-in" -->
+</div>
+
+</script>
+				</section>
+				<section data-markdown>
+<script type="text/template">
+### Solution?
+
+Use __libc__ instead!
+
+<div style="position:relative">
+
+<code class="lang-rust" data-noescape><span class="hljs-meta">#[repr(C)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">type_t</span></span> {
+    field: <span class="hljs-built_in invalid">i32</span>,
+    field2: <span class="invalid">&ast;mut i8</span>,
+}
+
+<span class="hljs-keyword">extern</span> <span class="hljs-string">"C"</span> {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">some_fn</span></span>(v: <span class="invalid">i32</span>) -&gt; &ast;<span class="hljs-keyword">mut</span> type_t;
+}
+</code>
+<!-- .element: class="special fragment fade-in-then-out" -->
+
+<code class="lang-rust" data-noescape><span class="hljs-meta">#[repr(C)]</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">type_t</span></span> {
+    field: <span class="hljs-built_in valid">libc::c_int</span>,
+    field2: <span class="valid">&ast;mut libc::c_char</span>,
+}
+
+<span class="hljs-keyword">extern</span> <span class="hljs-string">"C"</span> {
+    <span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">some_fn</span></span>(v: <span class="valid">libc::c_int</span>) -&gt; &ast;<span class="hljs-keyword">mut</span> type_t;
+}
+</code>
+<!-- .element: class="special fragment fade-in" -->
+</div>
+</script>
+				</section>
+				<section data-markdown>
+<script type="text/template">
+### Handling pointers
+
+Why and when using the **NonNull** type:
+
+<div style="position:relative">
+
+<code class="lang-rust" data-noescape><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">wrap_some_fn</span></span>() -&gt; <span class="hljs-built_in">Option</span>&lt;*<span class="hljs-keyword">mut</span> type_t&gt; {
+    <span class="hljs-keyword">unsafe</span> {
+        <span class="hljs-keyword">let</span> ptr = some_fn(<span class="hljs-number">0</span>);
+        <span class="hljs-keyword">if</span> ptr.is_null() {
+            <span class="hljs-literal">None</span>
+        } <span class="hljs-keyword">else</span> {
+            <span class="hljs-literal">Some</span>(ptr)
+        }
+    }
+}
+</code>
+<!-- .element: class="special fragment fade-in-then-out" -->
+
+<code class="lang-rust" data-noescape><span class="hljs-function"><span class="hljs-keyword">fn</span> <span class="hljs-title">wrap_some_fn</span></span>() -&gt; <span class="hljs-built_in">Option</span>&lt;NonNull&lt;type_t&gt;&gt; {
+    <span class="hljs-keyword">unsafe</span> { NonNull::new(some_fn(<span class="hljs-number">0</span>)) }
+}
+</code>
+<!-- .element: class="special fragment fade-in" -->
+</div>
+</script>
+				</section>
+				<section data-markdown>
+### NonNull doesn't solve all issues!
+
+ * You can still have concurrent access to the data pointed by the pointer.
+ * You still have to free the memory yourself.
+ * You still need to initialize the memory you allocated to the pointer.
+ * You can still have dangling pointers.
+				</section>
+				<section data-markdown>
+### Wrapping pointers is the key
+				</section>
+				<section data-markdown>
+<script type="text/template">
+### Using Drop
+
+```rust
+struct Wrap {
+	inner: NonNull<type_t>,
+}
+
+impl Drop for Wrap {
+	fn drop(&mut self) {
+		unsafe { libc::free(self.inner.as_ptr() as _) }
+	}
+}
+```
+</script>
+				</section>
+				<section>
+If your type implements <b>Drop</b>, don't implement <b>Clone</b>!
+				</section>
+				<section data-markdown>
+<script type="text/template">
+### Converting C string to Rust?
+
+**CStr** (and **CString**)
+
+```rust
+unsafe {
+	let s = CStr::new(c_func())
+		.expect("invalid pointer");
+	// Use it as a Rust string:
+	let r_s = s.to_str().expect("not utf8");
+}
+```
+</script>
+				</section>
+				<section data-markdown>
+<script type="text/template">
+### Iterating over a C array
+
+<div style="position:relative">
+
+<code class="lang-rust hljs" data-noescape><span class="hljs-keyword">use</span> std::mem::size_of;
+
+<span class="hljs-keyword">let</span> ptr = ptr <span class="hljs-keyword">as</span> &ast;<span class="hljs-keyword">const</span> <span class="hljs-built_in">i32</span>;
+<span class="hljs-keyword">for</span> pos <span class="hljs-keyword">in</span> <span class="hljs-number">0</span>..nb_bytes / size_of::&lt;<span class="hljs-built_in">i32</span>&gt;() {
+    <span class="hljs-keyword">let</span> nb = <span class="hljs-keyword">unsafe</span> { &ast;ptr.offset(pos <span class="hljs-keyword">as</span> _) };
+    <span class="hljs-comment">// Do something with the number.</span>
+}
+</code>
+<!-- .element: class="special fragment fade-in-then-out" -->
+
+
+<code class="lang-rust hljs" data-noescape><span class="hljs-keyword">use</span> std::mem::size_of;
+<span class="hljs-keyword">use</span> std::slice::from_raw_parts;
+
+<span class="hljs-keyword">let</span> array = <span class="hljs-keyword">unsafe</span> {
+    from_raw_parts(ptr <span class="hljs-keyword">as</span> &ast;<span class="hljs-keyword">const</span> <span class="hljs-built_in">i32</span>, nb_bytes / size_of::&lt;<span class="hljs-built_in">i32</span>&gt;())
+};
+<span class="hljs-keyword">for</span> nb <span class="hljs-keyword">in</span> array {
+    <span class="hljs-comment">// Do something with the number.</span>
+}
+</code>
+<!-- .element: class="special fragment fade-in" -->
+
+</div>
+</script>
+				</section>
+				<section data-markdown>
+### -sys or not?
+
+When and why creating **-sys** crates.
+
+ * Breaking change in **-sys** without breaking change in non **-sys**
+ * Lighter if you don't care about non **-sys**
+				</section>
+				<section>
+<h2>Thank you for listening!</h2>
+
+More advanced explanations on <br>&lt; <span style="color:#cea116;">blog.guillaume-gomez.fr</span> &gt;
+<br>
+<br>
+&lt; <span style="color:#cea116;">guillaume1.gomez@gmail.com</span> &gt;
+<br>
+<br>
+<img src="github.svg" class="inline-img" style="background: #ddd;border-radius: 50%;"> @GuillaumeGomez
+<br>
+<img src="twitter.svg" class="inline-img"> @imperioworld_
+<br>
+<img src="mastodon.svg" class="inline-img"> @imperio@fosstodon.org
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				],
+				autoAnimate: false,
+				progress: false,
+			});
+		</script>
+	</body>
+</html>
