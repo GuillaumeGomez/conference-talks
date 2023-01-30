@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Rust compiler merge process</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css">
+		<link rel="stylesheet" href="css/style.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+<h1>Rust compiler merge process</h1>
+
+<p>by <span style="color:#cea116;">Guillaume Gomez</span></p>
+				</section>
+				<section>
+<h2>Who am I?</h2>
+
+Rust language reviewer and contributor.
+<span style="padding: 0.9em 0;display: block;">Member of:</span>
+<ul>
+	<li>rustdoc team (team leader)</li>
+	<li>docs.rs team</li>
+	<li>dev-tools team</li>
+</ul>
+<br>
+<br>
+I am a Huawei engineer.
+				</section>
+				<section>
+<h3>A pull-request is opened</h3>
+
+A reviewer is assigned by the <span style="color:#cea116;">rustbot</span> bot...<br>
+<img src="./images/assign.png">
+				</section>
+				<section>
+<h3>A pull-request is opened</h3>
+
+... And tags are added as well<br>
+<img src="./images/tags.png">
+				</section>
+				<section data-markdown>
+### Teams repository
+
+[github.com/rust-lang/teams](https://github.com/rust-lang/teams)
+				</section>
+				<section>
+<h3>Governance website</h3>
+
+<a href="https://www.rust-lang.org/governance/">rust-lang.org/governance</a><br>
+<img src="./images/governance.png">
+				</section>
+				<section>
+<h3>Approval</h3>
+
+<ul>
+	<li style="list-style:none;margin-left:-1em;">If the pull request:</li>
+	<li>Has no performance impact</li>
+	<li>Makes no breaking change</li>
+	<li>Doesn't add new feature</li>
+	<li>CI passes</li>
+</ul>
+<br>
+<img src="./images/rplus.png">
+				</section>
+				<section data-markdown>
+### Continuous integration
+
+There are two "levels" of CI:
+
+ * Small subset run on pull request directly (most tests but only for linux x64)
+ * Full run of all tests for all platforms
+
+Nothing can be merged if the CI doesn't pass!
+				</section>
+				<section data-markdown>
+### Build queue
+
+[bors.rust-lang.org/queue/rust](https://bors.rust-lang.org/queue/rust)
+
+![bors queue](./images/queue.png)
+				</section>
+				<section data-markdown>
+### What is tested?
+
+ * Compiletest
+ * Unit tests
+ * Rustc and Rustdoc error output
+ * Documentation examples
+ * All tools tests (cargo, rustdoc, clippy, rustfmt, etc)
+ * Documentation dead links
+ * And quite a lot more!
+				</section>
+				<section data-markdown>
+### On which OS/architecture?
+
+ * Tier 1 platforms: Must build and pass test
+ * Tier 2 platforms: Must build
+ * Tier 3 plaftorms: Exists
+
+Target tier policy:
+
+[doc.rust-lang.org/nightly/rustc/target-tier-policy.html](https://doc.rust-lang.org/nightly/rustc/target-tier-policy.html)
+
+List of platforms for each tier:
+
+[doc.rust-lang.org/rustc/platform-support.html](https://doc.rust-lang.org/rustc/platform-support.html)
+				</section>
+				<section data-markdown>
+### What about releases?
+
+In (very) short:
+
+ 1. bors build queue is frozen.
+ 2. beta and stable branches are updated.
+ 3. All relevant information is updated everywhere.
+ 4. Binaries are generated for all plaftorms.
+ 5. Blog post is released.
+				</section>
+				<section>
+<h3>Performance</h3>
+
+Pull request was merged, but now it's time to check for performance impact.<br><br>
+<a href="https://perf.rust-lang.org">perf.rust-lang.org</a><br>
+
+<img src="./images/perf.png" style="width:47%;float:left;">
+<img src="./images/perf-comment.png" style="width:50%;float:right;">
+				</section>
+				<section data-markdown>
+### Other cases
+
+Adding a new feature or introducing a breaking changes. Three possibilities:
+
+ * RFC (Request For Comments): for big changes
+ * MCP (Major Compiler Changes): for "not too big" changes in the compiler
+ * FCP (Final Comment Period): for "not too big" changes
+				</section>
+				<section>
+<h3>Checking for potential regressions</h3>
+
+In case a pull request changes things that could introduce a regression, we use <span style="color:#cea116;">crater</span>.
+				</section>
+				<section>
+<h3>Crater</h3>
+
+<a href="https://crater.rust-lang.org">crater.rust-lang.org</a><br><br>
+<img src="./images/crater.png" style="width:50%;float:left;">
+<img src="./images/crater-comment.png" style="width:47%;float:right;">
+				</section>
+				<section>
+<h3>Tips for potential new contributors</h3>
+
+<ul>
+<li>Look at <span style="color:#cea116;">E-easy</span> or <span style="color:#cea116;">E-mentor</span> tagged issues.</li>
+<li>Read the rustc dev guide: <a href="https://rustc-dev-guide.rust-lang.org/">rustc-dev-guide.rust-lang.org</a></li>
+<li>Try to write compiler plugins or contribute to clippy to see how the compiler internals work</li>
+</ul><br>
+<br>
+<p>To help you with compiler plugins, take a look at the <span style="color:#cea116;">rustc-tools</span> crate.</p>
+				</section>
+				<section>
+<h2>Thank you for listening!</h2>
+
+More Rust things on <br>&lt; <span style="color:#cea116;">blog.guillaume-gomez.fr</span> &gt;
+<br>
+<br>
+&lt; <span style="color:#cea116;">guillaume1.gomez@gmail.com</span> &gt;
+<br>
+<br>
+<img src="github.svg" class="inline-img" style="background: #ddd;border-radius: 50%;"> @GuillaumeGomez
+<br>
+<img src="twitter.svg" class="inline-img"> @imperioworld_
+<br>
+<img src="mastodon.svg" class="inline-img"> @imperio@toot.cat
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				],
+				autoAnimate: false,
+				progress: true,
+			});
+		</script>
+	</body>
+</html>
