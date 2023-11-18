@@ -111,9 +111,9 @@ Rien ne peut être mergé si la CI ne passe pas !
 				<section data-markdown>
 ### Sur quel OS/architecture?
 
- * Plateforme tier 1: Doit builder et passer les tests
- * Plateforme tier 2: Doit builder
- * Plateforme tier 3: Existe
+ * Plateforme tier 1 : Doit builder et passer les tests
+ * Plateforme tier 2 : Doit builder
+ * Plateforme tier 3 : Existe
 
 
 Politique des tiers de "target" :
@@ -149,14 +149,14 @@ La pull request a été mergée, mais maintenant il est temps de vérifier si el
 
 L'ajout d'une nouvelle fonctionnalité ou un changement non rétro-compatible. Trois possibilités :
 
- * RFC (Request For Comments) : Pour les gros changements.
- * MCP (Major Compiler Changes) : Pour les changements "pas trop gros" (dans le compilateur uniquement).
+ * RFC (Request For Comments) : Pour les gros changements
+ * MCP (Major Compiler Changes) : Pour les changements "pas trop gros" (dans le compilateur uniquement)
  * FCP (Final Comment Period) : Pour les changements "pas trop gros"
 				</section>
 				<section>
 <h3>Vérifier de potentielles régressions</h3>
 
-Au cas où une pull request introduit des changements qui pourrait causer une régression, on utilise <span style="color:#cea116;">crater</span>.
+Au cas où une pull request introduit des changements qui pourrait introduire une régression, on utilise <span style="color:#cea116;">crater</span>.
 				</section>
 				<section>
 <h3>Crater</h3>
@@ -169,7 +169,7 @@ Au cas où une pull request introduit des changements qui pourrait causer une r�
 <h3>Astuces pour de potentiels nouveaux contributeurs</h3>
 
 <ul>
-<li>Issues avec le label <span style="color:#cea116;">E-easy</span> or <span style="color:#cea116;">E-mentor</span>.</li>
+<li>Issues avec le label <span style="color:#cea116;">E-easy</span> ou <span style="color:#cea116;">E-mentor</span>.</li>
 <li>Le rustc dev guide : <a href="https://rustc-dev-guide.rust-lang.org/">rustc-dev-guide.rust-lang.org</a></li>
 <li>Essayez d'écrire des plugins du compilateurs ou contribuez sur clippy pour voir comment le compilateur fonctionne.</li>
 </ul><br>
