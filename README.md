@@ -15,6 +15,7 @@ Video URL will be added when available.
  * [FOSDEM 2023 - Merging process of the rust compiler](./conferences/2023-fosdem-rust/index.html): [video](https://archive.fosdem.org/2023/schedule/event/rust_merging_process_of_the_rust_compiler/)
  * [Capitole du libre 2023 - Le processus de merge du compilateur de Rust](./conferences/2023-capitole-du-libre-rust/index.html): [video](https://www.youtube.com/watch?v=F5nxtUuj4zE)
  * [FOSDEM 2024 - Writing your own Rust linter](./conferences/2024-fosdem-rust/index.html): [video](https://archive.fosdem.org/2024/schedule/event/fosdem-2024-1638-writing-your-own-rust-linter/)
- * [rust-paris 2024 rust linter](./conferences/2024-rust-paris/index.html) (no recording)
+ * [rust-paris 2024 - Écrire son propre linter rust](./conferences/2024-rust-paris/index.html) (no recording)
  * [rust ukraine 2024 - Writing your own Rust linter](./conferences/2024-rust-ukraine/index.html)
  * [GOSIM 2024 - Writing your own Rust linter](./conferences/2024-gosim-china/index.html)
+ * [Capitole du libre 2024 - Écrire son propre linter rust](./conferences/2024-capitole-du-libre-rust/index.html)
