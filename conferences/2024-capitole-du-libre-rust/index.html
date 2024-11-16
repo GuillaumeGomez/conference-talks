@@ -26,50 +26,59 @@
 		<div class="reveal">
 			<div class="slides">
 				<section>
-<h1>Writing your own Rust linter</h1>
+<h1>Écrire son propre linter Rust</h1>
 
-<p>by <span style="color:#cea116;">Guillaume Gomez</span></p>
+<p>présenté par <span style="color:#cea116;">Guillaume Gomez</span></p>
 				</section>
 				<section>
-<h2>Who am I?</h2>
+<h2>Qui suis-je ?</h2>
 
-Rust language reviewer and contributor.
-<span style="padding: 0.9em 0;display: block;">Member of:</span>
+Reviewer et contributeur sur le langage Rust.
+<span style="padding: 0.9em 0;display: block;">Membre de :</span>
 <ul>
-	<li>rustdoc team (team leader)</li>
-	<li>docs.rs team</li>
-	<li>dev-tools team</li>
+	<li>rustdoc (team leader)</li>
+	<li>docs.rs</li>
+	<li>dev-tools</li>
+	<li>clippy-contributors</li>
 </ul>
 <br>
 <br>
-I am an engineer at Huawei.
+Je suis un ingénieur chez Huawei.
 				</section>
 				<section data-markdown>
-## What is a linter?
+## Qu'est-ce qu'un linter ?
 				</section>
 				<section data-markdown>
-## How is a rust linter actually working?
+## Comment un linter Rust fonctionne ?
 				</section>
 				<section data-markdown>
-## Why does it need to be a rust compiler extension?
+## Pourquoi a-t-il besoin d'être une extension du compilateur de Rust ?
 				</section>
 				<section data-markdown>
 ## Limitations
 
- * Can only work on crates compiled with the same rustc version
- * rustc API is not stable
- * Tied to a specified rustc version
- * Annoying to wrap in a cargo command
+ * Fonctionne seulement sur les crates compiléees avec la même version de rustc
+ * L'API de rustc API n'est pas stable
+ * Lié à une version spécifique de rustc
+ * Difficile à wrapper dans une commande cargo
 				</section>
 				<section data-markdown>
-## Lint passes
+## Les passes du compilateur (version simplifiée)
+
+ * AST
+ * HIR
+ * MIR
+ * Codegen
+				</section>
+				<section data-markdown>
+## Les "passes" de lints
 
 Early vs Late
 				</section>
 				<section data-markdown>
 ## `rustc-tools`
 
-Provides many helpers for setting up lints and cargo integration (and other things...)
+Fournit de l'aide pour mettre en place des lints et faciliter les intégrations dans cargo (entre autres choses...)
 
 ```toml
 [dependencies]
@@ -77,13 +86,7 @@ rustc-tools = "0.3"
 ```
 				</section>
 				<section data-markdown>
-## Setup
-
-`Cargo.toml`
-
-```toml
-rustc-workspace-hack = "1.0.0"
-```
+## Mise en place
 
 `rust-toolchain`
 
@@ -94,12 +97,12 @@ components = ["rustc-dev", "rustfmt", "llvm-tools-preview"]
 ```
 				</section>
 				<section>
-<h2>Declaring a lint</h2>
+<h2>Déclarer un lint</h2>
 <br>
 <img src="./images/decl-lint.png">
 				</section>
 				<section>
-<h2>Implementing a lint</h2>
+<h2>Implementer un lint</h2>
 <br>
 <img src="./images/impl-lint.png">
 				</section>
@@ -109,19 +112,19 @@ components = ["rustc-dev", "rustfmt", "llvm-tools-preview"]
 <img src="./images/main.png">
 				</section>
 				<section data-markdown>
-## Installing our linter
+## Installer notre linter
 
 ```console
 $ cargo install --path [project path]
 ```
 				</section>
 				<section data-transition="slide-in none">
-<h2>Running our linter</h2>
+<h2>Lancer notre linter</h2>
 <br>
 <img src="./images/console.png">
 				</section>
 				<section data-transition="none slide-out">
-<h2>Running our linter</h2>
+<h2>Lancer notre linter</h2>
 <br>
 <img src="./images/console-2.png">
 				</section>
@@ -129,19 +132,19 @@ $ cargo install --path [project path]
 <img src="./images/cat.jpg">
 				</section>
 				<section data-markdown>
-## Running our linter (but better)
+## Lancer notre linter (mais en mieux)
 
 ```console
 $ cargo +nightly-2023-10-06 tools-inner
 ```
 				</section>
 				<section>
-<h2>Wrapping the wrapper</h2>
+<h2>Wrapper le wrapper</h2>
 
 <img src="./images/cargo.png">
 				</section>
 				<section data-markdown>
-## Running our linter (but better better)
+## Lancer notre linter (mais en mieux mieux)
 
 ```console
 $ cargo install --path [project path]
@@ -149,14 +152,14 @@ $ cargo tools
 ```
 				</section>
 				<section>
-<h2>Blog post version</h2>
+<h2>Version blog post</h2>
 <br>
 <span style="color:#cea116;">blog.guillaume-gomez.fr/articles/2024-01-18+Writing+your+own+Rust+linter</span>
 				</section>
 				<section>
-<h2>Thank you for listening!</h2>
+<h2>Merci pour votre attention !</h2>
 
-More Rust things on <br>&lt; <span style="color:#cea116;">blog.guillaume-gomez.fr</span> &gt;
+Plus d'articles/tutoriels sur Rust à <br>&lt; <span style="color:#cea116;">blog.guillaume-gomez.fr</span> &gt;
 <br>
 <br>
 &lt; <span style="color:#cea116;">guillaume1.gomez@gmail.com</span> &gt;
