@@ -18,4 +18,4 @@ Video URL will be added when available.
  * [rust-paris 2024 - Écrire son propre linter rust](./conferences/2024-rust-paris/index.html) (no recording)
  * [rust ukraine 2024 - Writing your own Rust linter](./conferences/2024-rust-ukraine/index.html)
  * [GOSIM 2024 - Writing your own Rust linter](./conferences/2024-gosim-china/index.html) - [video](https://www.youtube.com/watch?v=S9zHXy_qOvc)
- * [Capitole du libre 2024 - Écrire son propre linter rust](./conferences/2024-capitole-du-libre-rust/index.html)
+ * [Capitole du libre 2024 - Écrire son propre linter rust](./conferences/2024-capitole-du-libre-rust/index.html) - [video](https://www.youtube.com/watch?v=YzeXRTb-igg)
