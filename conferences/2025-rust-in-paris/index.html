@@ -97,6 +97,26 @@ pub fn foo() {}
 ``````
 				</section>
 				<section data-markdown>
+## More options
+
+ * `--show-output` (`cargo test --doc -- --show-output`)
+ * `#![doc(test(attr(...)))]`
+				</section>
+				<section data-markdown>
+# Example (again++)
+
+``````rust
+#![doc(test(attr(warn(unused))))]
+
+//! ```
+//! let x = 12;
+//! ```
+``````
+				</section>
+				<section>
+<img src="images/output.png">
+				</section>
+				<section data-markdown>
 ## ... So how do they work?
 
 To generate doctests, we need to check a few things:
