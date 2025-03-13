@@ -157,6 +157,12 @@ fn main() {
  * Cannot test non-public API
  * No support from tools (clippy, rustfmt...)
 				</section>
+				<section>
+<h2>Merged doctests!</h2>
+
+<p>Sorry...</p>
+<img src="./images/christmas cat.jpg">
+				</section>
 				<section data-markdown>
 ## Merged doctests?
 
@@ -216,10 +222,11 @@ mod __doctest_0 {
 				<section data-markdown>
 ## Merged doctests limitations
 
- * Some code attributes aren't support (`test_harness`, `compile_fail`)
+ * Some code attributes aren't supported (`test_harness`, `compile_fail`)
  * Some options are not supported (`--show-output`)
  * `std::panic::Location::caller()` is mostly useless
  * If any of the merged doctests failed to compile... then none is run as merged doctests
+ * They need to be grouped by edition
 				</section>
 				<section data-markdown>
 ## New code attribute
