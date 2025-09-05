@@ -19,4 +19,4 @@ Video URL will be added when available.
  * [rust ukraine 2024 - Writing your own Rust linter](./conferences/2024-rust-ukraine/index.html)
  * [GOSIM 2024 - Writing your own Rust linter](./conferences/2024-gosim-china/index.html) - [event link](https://china2024.gosim.org/schedule-october-17) - [video](https://www.youtube.com/watch?v=S9zHXy_qOvc)
  * [Capitole du libre 2024 - Écrire son propre linter rust](./conferences/2024-capitole-du-libre-rust/index.html) - [event link](https://capitoledulibre.org/programme/#session/BWHMSS/) - [video](https://www.youtube.com/watch?v=YzeXRTb-igg)
- * [Rust in Paris 2025 - How doctests work](./conferences/2025-rust-in-paris/index.html)
+ * [Rust in Paris 2025 - How doctests work](./conferences/2025-rust-in-paris/index.html) - [video](https://www.youtube.com/watch?v=NmgNi6kFXZI)
