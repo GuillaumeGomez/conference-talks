@@ -1,0 +1,243 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>How doctests work</title>
+
+		<link rel="stylesheet" href="../css/reveal.css">
+		<link rel="stylesheet" href="../css/theme/black.css">
+		<link rel="stylesheet" href="../css/style.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="../lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../css/print/pdf.css' : '../css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+<h1>Rust GCC backend: Why and how</h1>
+
+<p>by <span style="color:#cea116;">Guillaume Gomez</span></p>
+				</section>
+				<section>
+<h2>Who am I?</h2>
+
+Rust language reviewer and contributor.
+<span style="padding: 0.9em 0;display: block;">Member of:</span>
+<ul>
+	<li>rustdoc team (team leader)</li>
+	<li>compiler team</li>
+	<li>docs.rs team</li>
+	<li>dev-tools team</li>
+	<li>clippy-contributors team</li>
+</ul>
+<br>
+<br>
+I am an engineer at Huawei.
+				</section>
+				<section data-markdown>
+## Passes of the Rust compiler (simplified, a lot)
+
+* AST: checks that the syntax is valid
+* HIR: checks if types are valid
+* MIR: checks lifetimes and runs borrow-checker
+* codegen: generate binary code
+				</section>
+				<section data-markdown>
+## Backend and front-end
+
+What's the difference?
+				</section>
+				<section data-markdown>
+## What's the point of having a GCC backend?
+
+* LLVM was created in 2003 and GCC in 1987, lot of old targets will never be supported by LLVM
+* GCC modules (allowed to detect a bad lifetime case in `librsvg`)
+* In some contexts, one is generating better binaries than the others, so at least you have the choice
+* Want to compile games on Dreamcast? You can with the GCC backend
+				</section>
+				<section data-markdown>
+## Difference between gccrs and the GCC backend
+
+* gccrs: front-end
+* GCC backend: well, backend
+				</section>
+				<section data-markdown>
+## Calling GCC internal API from Rust compiler
+
+`libgccjit` to the rescue!
+				</section>
+				<section data-markdown>
+## How to implement Rust compiler backend
+
+`rustc_codegen_ssa` provides an abstract interface that backends need to implement through traits.
+				</section>
+				<section data-markdown>
+## Entrypoint
+
+```rust
+#[no_mangle]
+pub fn _rustc_codegen_backend() -> Box<dyn CodegenBackend> {
+    // This is the entrypoint.
+}
+```
+				</section>
+				<section data-markdown>
+## Example of implementing "const strings"
+
+```rust
+impl<'gcc, 'tcx> ConstCodegenMethods for CodegenCx<'gcc, 'tcx> {
+    /// Returns the pointer to the string and its length.
+    fn const_str(&self, s: &str) -> (RValue<'gcc>, RValue<'gcc>) {
+        // Call GCC API to declare this string.
+    }
+}
+```
+				</section>
+				<section data-markdown>
+### Example of implementing "const strings" bis
+
+```rust
+fn const_str(&self, s: &str) -> (RValue<'gcc>, RValue<'gcc>) {
+  let mut cache = self.const_str_cache.borrow_mut();
+  let str_global = cache.get(s).copied().unwrap_or_else(|| {
+    let st = self.context.new_string_literal(s);
+    let sym = self.generate_local_symbol_name("str");
+    let g = self.declare_private_global(&sym, self.val_ty(st));
+    cache.insert(s.to_owned(), g);
+    g
+  });
+  let cs = self.const_ptrcast(str_global.get_address(None),
+    self.type_ptr_to(self.layout_of(
+      self.tcx.types.str_).gcc_type(self)),
+  );
+  (cs, self.const_usize(s.len() as _))
+}
+```
+				</section>
+				<section data-markdown>
+## Optimizations done in backends
+
+Rust compiler has extra information it can communicate to the codegen.
+				</section>
+				<section data-markdown>
+## Example of backend optimization
+
+```rust
+fn t(a: &i32) -> i32 {
+    *a
+}
+```
+
+The code the codegen receives looks like this:
+
+```C
+int t(int *a) {
+  if (!a) {
+    return -1;
+  }
+  return *a;
+}
+```
+				</section>
+				<section data-markdown>
+## Example of backend optimization bis
+
+Compiling with -O3:
+
+```x86asm
+t:
+        test    rdi, rdi
+        je      .L5
+        mov     eax, DWORD PTR [rdi]
+        ret
+.L5:
+        mov     eax, -1
+        ret
+```
+				</section>
+				<section data-markdown>
+## Example of backend optimization bis bis
+
+Now since it's a reference, we know the pointer can never be NULL so the backend generates instead:
+
+```C
+_attribute_((nonnull(1)))
+int t(int *a) {
+  if (!a) {
+    return -1;
+  }
+  return *a;
+}
+```
+				</section>
+				<section data-markdown>
+## Example of backend optimization bis bis bis
+
+Again compiled with -O3:
+
+```x86asm
+t:
+        mov     eax, DWORD PTR [rdi]
+        ret
+```
+				</section>
+				<section>
+<h2>Written version of this blog post</h2>
+
+<span style="color:#cea116;">blog.guillaume-gomez.fr/articles/2025-12-15+Rust+GCC+backend%3A+Why+and+how</span>
+				</section>
+				<section>
+<h2>Reading recommendations</h2>
+
+Matt Godbolt (creator of <span style="color:#cea116;">godbolt.org</span>) is writing an "Advent of Compiler Optimizations": <span style="color:#cea116;">https://xania.org/AoCO2025</span>
+				</section>
+				<section>
+<h2>Thank you for listening!</h2>
+
+More Rust things on <br>&lt; <span style="color:#cea116;">blog.guillaume-gomez.fr</span> &gt;
+<br>
+<br>
+&lt; <span style="color:#cea116;">guillaume1.gomez@gmail.com</span> &gt;
+<br>
+<br>
+<img src="../images/github.svg" class="inline-img" style="background: #ddd;border-radius: 50%;"> @GuillaumeGomez
+<br>
+<img src="../images/mastodon.svg" class="inline-img"> @imperio@toot.cat
+<br>
+<img src="../images/bluesky.svg" class="inline-img"> @imperioworld.bsky.social
+				</section>
+			</div>
+		</div>
+
+		<script src="../lib/js/head.min.js"></script>
+		<script src="../js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: '../plugin/markdown/marked.js' },
+					{ src: '../plugin/markdown/markdown.js' },
+					{ src: '../plugin/notes/notes.js', async: true },
+					{ src: '../plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				],
+				autoAnimate: false,
+				progress: true,
+			});
+		</script>
+	</body>
+</html>
