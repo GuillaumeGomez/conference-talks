@@ -135,18 +135,19 @@ Rust compiler has extra information it can communicate to the codegen.
 ## Example of backend optimization
 
 ```rust
-fn t(a: &i32) -> i32 {
-    *a
+fn foo(a: &mut i32, b: &mut i32) -> i32 {
+  *a = 123;
+  *b = 67;
+  *a
 }
 ```
 
 The code the codegen receives looks like this:
 
 ```C
-int t(int *a) {
-  if (!a) {
-    return -1;
-  }
+int foo(int *a, int *b) {
+  *a = 123;
+  *b = 67;
   return *a;
 }
 ```
@@ -157,28 +158,23 @@ int t(int *a) {
 Compiling with -O3:
 
 ```x86asm
-t:
-        test    rdi, rdi
-        je      .L5
-        mov     eax, DWORD PTR [rdi]
-        ret
-.L5:
-        mov     eax, -1
-        ret
+foo:
+    movl    $123, (%rdi)
+    movl    $67, (%rsi)
+    movl    (%rdi), %eax
+    ret
 ```
 				</section>
 				<section data-markdown>
 ## Example of backend optimization bis bis
 
-Now since it's a reference, we know the pointer can never be NULL so the backend generates instead:
+Now since it's a mutable references, we know the pointer can never point to the same memory location so we can add `restrict`:
 
 ```C
-_attribute_((nonnull(1)))
-int t(int *a) {
-  if (!a) {
-    return -1;
-  }
-  return *a;
+int foo(int *restrict a, int *restrict b) {
+    *a = 123;
+    *b = 67;
+    return *a;
 }
 ```
 				</section>
@@ -188,9 +184,11 @@ int t(int *a) {
 Again compiled with -O3:
 
 ```x86asm
-t:
-        mov     eax, DWORD PTR [rdi]
-        ret
+foo:
+    movl    $123, (%rdi)
+    movl    $67, (%rsi)
+    movl    $123, %eax   ; no need to read registry!
+    ret
 ```
 				</section>
 				<section>
