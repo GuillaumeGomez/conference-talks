@@ -168,7 +168,7 @@ foo:
 				<section data-markdown>
 ## Example of backend optimization bis bis
 
-Now since it's a mutable references, we know the pointer can never point to the same memory location so we can add `restrict`:
+Now since it's a mutable references, we know the pointer can never point to the same memory location so we can add restrict:
 
 ```C
 int foo(int *restrict a, int *restrict b) {
