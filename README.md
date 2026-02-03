@@ -21,3 +21,4 @@ Video URL will be added when available.
  * [Capitole du libre 2024 - Écrire son propre linter rust](./conferences/2024-capitole-du-libre-rust/index.html) - [event link](https://capitoledulibre.org/programme/#session/BWHMSS/) - [video](https://www.youtube.com/watch?v=YzeXRTb-igg)
  * [Rust in Paris 2025 - How doctests work](./conferences/2025-rust-in-paris/index.html) - [video](https://www.youtube.com/watch?v=NmgNi6kFXZI)
  * [London meetup 2025 - Rust GCC backend: Why and how](./conferences/2025-london-meetup/index.html)
+ * [Rust in Paris 2026 - Rust GCC backend: Why and how](./conferences/2026-rust-in-paris/index.html)
